@@ -34,8 +34,7 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: node --test tests/review.test.cjs
       - run: python scripts/library.py audit
-      - name: Enforce complete history when enabled
-        if: vars.REQUIRE_COMPLETE_HISTORY == 'true'
+      - name: Enforce complete original history
         run: python scripts/library.py audit --require-complete
       - run: python scripts/library.py build
       - run: python scripts/library.py links

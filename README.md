@@ -1,6 +1,6 @@
 # AI 算法寓言 · 学习书架
 
-收录课程原始全文、原题与原答案，提供全文检索、折叠答案、D+1/D+7/D+30复习与进度备份。当前恢复第15—18期，前14期仍待取回；没有使用摘要或重新生成的内容冒充原文。
+收录课程原始全文、原题与原答案，提供全文检索、折叠答案、D+1/D+7/D+30复习与进度备份。已从原聊天分享恢复第1—18期，共162道原题与162份原答案；没有使用摘要或重新生成的内容冒充原文。分段推送的课程按原消息顺序无改写拼接，保留片段ID与校验哈希。
 
 ## 网站
 
@@ -27,6 +27,6 @@ python3 scripts/library.py links
 python3 -m http.server 8765 --directory dist
 ```
 
-`python3 scripts/library.py audit --require-complete` 必须在补齐前14期后才会通过。普通构建成功不代表18期完整。补齐后可设置仓库变量 `REQUIRE_COMPLETE_HISTORY=true`，将其设为发布门槛。
+`python3 scripts/library.py audit --require-complete` 已通过18期完整性检查。工作流始终执行这一历史完整性门槛，避免历史课程悄悄丢失。原始片段及拼接证据见 `content/sources/shared-course-fragments.json`。
 
 原聊天内部引用不能还原外部网址时会显示“未解析”；完整原文下载保留原始引用。课程研究事实未重新审校。KaTeX资源随站点托管，并保留原许可证。

@@ -5,6 +5,7 @@
   let courses;
   try { const response=await fetch(prefix+'data.json'); if(!response.ok)throw new Error('课程数据加载失败'); courses=await response.json(); }
   catch(error) { const p=el('p','课程数据暂时无法加载。课程原文链接仍可直接打开。','notice'); document.querySelector('main').prepend(p); return; }
+  const originalView=(course,text)=>(course.source.annotations||[]).reduce((value,a)=>value.split(a.marker).join(a.markdown),text);
   const allowed=new Set(courses.map(c=>String(c.episode)));
   function read() { const value=JSON.parse(localStorage.getItem(key)||'{}'); if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('进度格式错误'); return value; }
   function save(value) { localStorage.setItem(key,JSON.stringify(value)); }
@@ -34,7 +35,7 @@
         const link=el('a',`第${c.episode}期 · ${c.title}`);link.href=`${prefix}courses/${String(c.episode).padStart(3,'0')}.html`;card.append(link);
         card.append(el('p',day?`${day<=R.today()?'待复习':'下次复习'}：${day} · D+${[1,7,30][s.stage]}`:'D+1 / D+7 / D+30 本轮均已完成','muted'));
         if(due.includes(c)) {
-          for(const q of c.questions) {const block=el('div',undefined,'review-question');block.append(el('p',q.question));const details=el('details',undefined,'answer');details.append(el('summary',`Q${q.id} 原答案`),el('div',q.answer,'verbatim-answer'));block.append(details);card.append(block);}
+          for(const q of c.questions) {const block=el('div',undefined,'review-question');block.append(el('p',originalView(c,q.question)));const details=el('details',undefined,'answer');details.append(el('summary',`Q${q.id} 原答案`),el('div',originalView(c,q.answer),'verbatim-answer'));block.append(details);card.append(block);}
           const actions=el('div',undefined,'actions');for(const [label,remembered] of [['已掌握，安排下一次',true],['仍模糊，明天再练',false]]){const b=el('button',label);b.addEventListener('click',()=>{try{const current=read();current[c.episode]=R.grade(current[c.episode],remembered,R.today());save(current);render();}catch{document.querySelector('#progress-status').textContent='保存失败，请检查浏览器本地存储权限。';}});actions.append(b);}card.append(actions);
         }
         list.append(card);

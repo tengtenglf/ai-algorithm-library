@@ -56,6 +56,114 @@
     "kind": "verbatim_chatgpt_message",
     "conversation_id": "6ac9e367-6ea8-83ec-aeee-555083ffcfb7",
     "message_id": "8d545aca-f23d-44c8-a509-777c39188361",
-    "retrieved_at": "2026-10-27T14:21:39.170033+08:00"
+    "retrieved_at": "2026-10-27T11:20:25.727013+08:00",
+    "annotations": [
+      {
+        "marker": "urlApple 官方研究全文（2026-10-15）https://machinelearning.apple.com/research/mlx-distributed-inference",
+        "markdown": "[Apple 官方研究全文（2026-10-15）](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"0\"}",
+        "markdown": "[Apple 官方研究全文（2026-10-15）](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlMLX 官方开源仓库https://github.com/ml-explore/mlx",
+        "markdown": "[MLX 官方开源仓库](https://github.com/ml-explore/mlx?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"1\"}",
+        "markdown": "[MLX 官方开源仓库](https://github.com/ml-explore/mlx?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "citeturn246232search0",
+        "markdown": "([Apple Machine Learning Research](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"2\"}",
+        "markdown": "([Apple Machine Learning Research](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": "citeturn246232search0",
+        "markdown": "([Apple Machine Learning Research](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"3\"}",
+        "markdown": "([Apple Machine Learning Research](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": "citeturn246232search0",
+        "markdown": "([Apple Machine Learning Research](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"4\"}",
+        "markdown": "([Apple Machine Learning Research](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": "urlAmdahl 1967 年原始论文https://doi.org/10.1145/1465482.1465560",
+        "markdown": "[Amdahl 1967 年原始论文](https://doi.org/10.1145/1465482.1465560?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"5\"}",
+        "markdown": "[Amdahl 1967 年原始论文](https://doi.org/10.1145/1465482.1465560?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "citeturn348368search0",
+        "markdown": "([数字对象标识符](https://doi.org/10.1145/1465482.1465560?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"6\"}",
+        "markdown": "([数字对象标识符](https://doi.org/10.1145/1465482.1465560?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": "urlBraess 悖论英文论文，2005https://doi.org/10.1287/trsc.1050.0127",
+        "markdown": "[Braess 悖论英文论文，2005](https://doi.org/10.1287/trsc.1050.0127?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"7\"}",
+        "markdown": "[Braess 悖论英文论文，2005](https://doi.org/10.1287/trsc.1050.0127?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "citeturn281304search0turn281304search1",
+        "markdown": "([PubsOnline](https://pubsonline.informs.org/doi/pdf/10.1287/trsc.1050.0127?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"8\"}",
+        "markdown": "([PubsOnline](https://pubsonline.informs.org/doi/pdf/10.1287/trsc.1050.0127?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": "urlApple：Local and Distributed Large LLM Inference with MLX and RDMA on Mac Studio（2026-10-15）https://machinelearning.apple.com/research/mlx-distributed-inference",
+        "markdown": "[Apple：Local and Distributed Large LLM Inference with MLX and RDMA on Mac Studio（2026-10-15）](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"9\"}",
+        "markdown": "[Apple：Local and Distributed Large LLM Inference with MLX and RDMA on Mac Studio（2026-10-15）](https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlApple MLX GitHubhttps://github.com/ml-explore/mlx",
+        "markdown": "[Apple MLX GitHub](https://github.com/ml-explore/mlx?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"10\"}",
+        "markdown": "[Apple MLX GitHub](https://github.com/ml-explore/mlx?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlGene Amdahl：Validity of the Single Processor Approach（1967）https://doi.org/10.1145/1465482.1465560",
+        "markdown": "[Gene Amdahl：Validity of the Single Processor Approach（1967）](https://doi.org/10.1145/1465482.1465560?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"11\"}",
+        "markdown": "[Gene Amdahl：Validity of the Single Processor Approach（1967）](https://doi.org/10.1145/1465482.1465560?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlBraess、Nagurney、Wakolbinger：On a Paradox of Traffic Planning（2005 英文译本）https://doi.org/10.1287/trsc.1050.0127",
+        "markdown": "[Braess、Nagurney、Wakolbinger：On a Paradox of Traffic Planning（2005 英文译本）](https://doi.org/10.1287/trsc.1050.0127?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"12\"}",
+        "markdown": "[Braess、Nagurney、Wakolbinger：On a Paradox of Traffic Planning（2005 英文译本）](https://doi.org/10.1287/trsc.1050.0127?utm_source=chatgpt.com)"
+      }
+    ],
+    "share_url": "https://chatgpt.com/share/6ae04288-fa20-83ec-9a8d-b88f11e5a1f0",
+    "share_body_sha256": "44b61444e85665a38898e3c66fe3784c06dd430ed2b16cb9fe18b9ec69d77b6a"
   }
 }

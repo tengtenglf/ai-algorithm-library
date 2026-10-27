@@ -56,6 +56,122 @@
     "kind": "verbatim_chatgpt_message",
     "conversation_id": "6ac9e367-6ea8-83ec-aeee-555083ffcfb7",
     "message_id": "d5d6052c-72d5-4c1b-8d46-eb65764f8912",
-    "retrieved_at": "2026-10-27T11:20:25.726149+08:00"
+    "retrieved_at": "2026-10-27T11:20:25.726149+08:00",
+    "annotations": [
+      {
+        "marker": "urlScience 正式论文https://www.science.org/doi/10.1126/science.aeh7930",
+        "markdown": "[Science 正式论文](https://www.science.org/doi/10.1126/science.aeh7930?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"0\"}",
+        "markdown": "[Science 正式论文](https://www.science.org/doi/10.1126/science.aeh7930?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlarXiv 原始预印本https://arxiv.org/abs/2506.22405",
+        "markdown": "[arXiv 原始预印本](https://arxiv.org/abs/2506.22405?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"1\"}",
+        "markdown": "[arXiv 原始预印本](https://arxiv.org/abs/2506.22405?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlMicrosoft Research 官方说明https://www.microsoft.com/en-us/research/publication/sequential-diagnosis-with-language-models/",
+        "markdown": "[Microsoft Research 官方说明](https://www.microsoft.com/en-us/research/publication/sequential-diagnosis-with-language-models/?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"2\"}",
+        "markdown": "[Microsoft Research 官方说明](https://www.microsoft.com/en-us/research/publication/sequential-diagnosis-with-language-models/?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "citeturn909429view2",
+        "markdown": "([arXiv](https://arxiv.org/html/2506.22405v1))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"3\"}",
+        "markdown": "([arXiv](https://arxiv.org/html/2506.22405v1))"
+      },
+      {
+        "marker": "citeturn940369search0turn153132news21",
+        "markdown": "([科学杂志](https://www.science.org/doi/10.1126/science.aeh7930?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"4\"}",
+        "markdown": "([科学杂志](https://www.science.org/doi/10.1126/science.aeh7930?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": "citeturn909429view2",
+        "markdown": "([arXiv](https://arxiv.org/html/2506.22405v1))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"5\"}",
+        "markdown": "([arXiv](https://arxiv.org/html/2506.22405v1))"
+      },
+      {
+        "marker": "url1763 年原始论文记录https://doi.org/10.1098/rstl.1763.0053",
+        "markdown": "[1763 年原始论文记录](https://doi.org/10.1098/rstl.1763.0053?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"6\"}",
+        "markdown": "[1763 年原始论文记录](https://doi.org/10.1098/rstl.1763.0053?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "url1978 年原始论文https://doi.org/10.1007/BF01588971",
+        "markdown": "[1978 年原始论文](https://doi.org/10.1007/BF01588971?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"7\"}",
+        "markdown": "[1978 年原始论文](https://doi.org/10.1007/BF01588971?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlBest Algorithms for Approximating the Maximum of a Submodular Set Functionhttps://doi.org/10.1287/moor.3.3.177",
+        "markdown": "[Best Algorithms for Approximating the Maximum of a Submodular Set Function](https://doi.org/10.1287/moor.3.3.177?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"8\"}",
+        "markdown": "[Best Algorithms for Approximating the Maximum of a Submodular Set Function](https://doi.org/10.1287/moor.3.3.177?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlSequential Diagnosis with Language Models，Science，2026-10-22https://www.science.org/doi/10.1126/science.aeh7930",
+        "markdown": "[Sequential Diagnosis with Language Models，Science，2026-10-22](https://www.science.org/doi/10.1126/science.aeh7930?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"9\"}",
+        "markdown": "[Sequential Diagnosis with Language Models，Science，2026-10-22](https://www.science.org/doi/10.1126/science.aeh7930?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlMicrosoft 原始预印本，2025-06-27https://arxiv.org/abs/2506.22405",
+        "markdown": "[Microsoft 原始预印本，2025-06-27](https://arxiv.org/abs/2506.22405?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"10\"}",
+        "markdown": "[Microsoft 原始预印本，2025-06-27](https://arxiv.org/abs/2506.22405?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlThomas Bayes，1763 年原始论文https://doi.org/10.1098/rstl.1763.0053",
+        "markdown": "[Thomas Bayes，1763 年原始论文](https://doi.org/10.1098/rstl.1763.0053?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"11\"}",
+        "markdown": "[Thomas Bayes，1763 年原始论文](https://doi.org/10.1098/rstl.1763.0053?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlNemhauser、Wolsey、Fisher，1978https://doi.org/10.1007/BF01588971",
+        "markdown": "[Nemhauser、Wolsey、Fisher，1978](https://doi.org/10.1007/BF01588971?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"12\"}",
+        "markdown": "[Nemhauser、Wolsey、Fisher，1978](https://doi.org/10.1007/BF01588971?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlLazier Than Lazy Greedy，AAAI 2015https://doi.org/10.1609/aaai.v29i1.9486",
+        "markdown": "[Lazier Than Lazy Greedy，AAAI 2015](https://doi.org/10.1609/aaai.v29i1.9486?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"13\"}",
+        "markdown": "[Lazier Than Lazy Greedy，AAAI 2015](https://doi.org/10.1609/aaai.v29i1.9486?utm_source=chatgpt.com)"
+      }
+    ],
+    "share_url": "https://chatgpt.com/share/6ae04288-fa20-83ec-9a8d-b88f11e5a1f0",
+    "share_body_sha256": "04a448c41df60073901a6b16d7871fca610aada5299ee0f3fc40875e17162662"
   }
 }

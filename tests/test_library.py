@@ -80,6 +80,18 @@ class ContentTests(unittest.TestCase):
         self.assertIn(r'\(P(H\mid E)\)', rendered)
         self.assertIn(r'\[x^2+1\]', rendered)
 
+    def test_historical_header_and_original_closing_formats(self):
+        raw=lesson(1).replace('## 第 1 期｜2026 年 10 月 10 日','# AI 算法寓言 · 第 01 期\n**2026 年 10 月 10 日**').replace('### 今日主题','## 今日主题').replace('**第 1 期完成。**','**第一期课程完成。**')
+        self.assertEqual(lib.parse_course(raw,'old-1','conv')['episode'],1)
+        raw2=lesson(2).replace('**第 2 期完成。**','这就是今天的《AI 算法寓言·专家成长课程》。')
+        self.assertEqual(lib.parse_course(raw2,'old-2','conv')['episode'],2)
+
+    def test_render_resolves_only_archived_citation_annotations(self):
+        token='\ue200cite\ue202turn-source\ue201'
+        rendered=lib.render_md('原始研究'+token, [{'marker':token,'markdown':'[原论文](https://example.org/paper)'}])
+        self.assertIn('href="https://example.org/paper"',rendered)
+        self.assertNotIn(token,rendered)
+
     def test_fetch_rejects_unsafe_or_absent_feed(self):
         with self.assertRaises(ValueError):
             lib.fetch_feed('http://127.0.0.1/a')

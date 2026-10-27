@@ -42,7 +42,8 @@ def main():
     report=sync(ROOT,today,source)
     Path(args.report).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     ledger=ROOT/'content/sync/latest.json'
-    if report['imported'] or not ledger.exists():
+    old=json.loads(ledger.read_text()) if ledger.exists() else {}
+    if report['imported'] or old.get('complete_count')!=report['complete_count']:
         ledger.parent.mkdir(parents=True,exist_ok=True)
         ledger.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report,ensure_ascii=False))

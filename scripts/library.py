@@ -21,6 +21,7 @@ from markdown_it import MarkdownIt
 
 ROOT = Path(__file__).resolve().parents[1]
 MD = MarkdownIt('commonmark', {'html': False}).enable('table')
+EPISODE = r'^#{1,3}\s+[^\n]*?第\s*(\d+)\s*期(?:[｜|]|\s*$)'
 
 
 def sha(text):
@@ -28,9 +29,9 @@ def sha(text):
 
 
 def parse_course(raw, message_id, conversation_id):
-    ep = re.search(r'^#{1,3}\s+第\s*(\d+)\s*期[｜|]', raw, re.M)
+    ep = re.search(EPISODE, raw, re.M)
     day = re.search(r'(20\d\d)\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日', raw)
-    title = re.search(r'^###\s*今日主题[：:]\s*(.+)', raw, re.M)
+    title = re.search(r'^#{2,3}\s*今日主题[：:]\s*(.+)', raw, re.M)
     section = re.search(r'^# [^\n]*参考答案[^\n]*\n', raw, re.M)
     if not all([ep, day, title, section]) or len(raw) < 500:
         raise ValueError('不是完整课程：期号、日期、主题、正文或原答案缺失；禁止用内容引用或摘要代替')
@@ -38,7 +39,11 @@ def parse_course(raw, message_id, conversation_id):
     if not 1 <= episode <= 99999:
         raise ValueError('期号超出范围')
     when = date(*map(int, day.groups())).isoformat()
-    if not re.search(r'第\s*' + str(episode) + r'\s*期[^\n]{0,4}完成', raw[-700:]):
+    closing = re.search(r'第\s*0?' + str(episode) + r'\s*期[^\n]{0,4}完成', raw[-700:])
+    # These two historical editions predate the later numbered closing style.
+    # They still must pass the same nine original Q/A checks below.
+    legacy_closing = (episode == 1 and '第一期课程完成。' in raw[-700:]) or (episode == 2 and '这就是今天的《AI 算法寓言·专家成长课程》。' in raw[-700:])
+    if not closing and not legacy_closing:
         raise ValueError('课程结束标记缺失，可能被截断')
     before, after = raw[:section.start()], raw[section.end():]
     qm = list(re.finditer(r'^\*\*Q(\d+)[｜|：:][^\n]*\n', before, re.M))
@@ -73,9 +78,14 @@ def import_messages(root, messages, conversation_id):
     pending = {}
     for message in messages:
         raw = message.get('text', '')
-        if not re.search(r'第\s*\d+\s*期[｜|]', raw):
+        if not re.search(EPISODE, raw, re.M):
             continue
         course = parse_course(raw, message['id'], conversation_id)
+        for key in ['annotations', 'message_parts', 'share_url']:
+            if key in message:
+                course['source'][key] = message[key]
+        if len(message.get('message_parts', [])) > 1:
+            course['source']['kind'] = 'verbatim_joined_chatgpt_messages'
         path = folder / f'{course["episode"]:03}.json'
         if path in pending and pending[path]['body_sha256'] != course['body_sha256']:
             raise ValueError(f'批内同一期内容冲突：{path.name}')
@@ -135,7 +145,7 @@ def audit(root, require_complete=False):
               'episodes': ids, 'missing_episodes': missing,
               'question_count': sum(len(x['questions']) for x in courses),
               'answer_count': sum(len(x['questions']) for x in courses),
-              'unresolved_citations': sum(len(re.findall(r':chatgpt-content-reference\{', x['body'])) for x in courses),
+              'unresolved_citations': sum(len(re.findall(r'::?chatgpt-content-reference\{[^}]*\}|\ue200[^\ue201]*\ue201', resolve_annotations(x['body'], x['source'].get('annotations', [])))) for x in courses),
               'chatgpt_task_output_bridge': 'not_verified',
               'source_project_recovered': False}
     if require_complete and missing:
@@ -143,9 +153,17 @@ def audit(root, require_complete=False):
     return result
 
 
-def render_md(text):
+def resolve_annotations(text, annotations):
+    for annotation in annotations:
+        text = text.replace(annotation['marker'], annotation['markdown'])
+    return text
+
+
+def render_md(text, annotations=None):
+    text = resolve_annotations(text, annotations or [])
     # Citation IDs have no public URL; show the evidence gap without inventing links.
     text = re.sub(r'::?chatgpt-content-reference\{[^}]*\}', '〔原聊天引用：未解析，待补来源〕', text)
+    text = re.sub(r'\ue200[^\ue201]*\ue201', '〔原聊天引用：未解析，待补来源〕', text)
     math = []
     def protect(match):
         token = f'ALGORITHMMATH{len(math)}TOKEN'
@@ -163,16 +181,17 @@ def render_course(course):
     section = re.search(r'^# [^\n]*参考答案[^\n]*\n', raw, re.M)
     before, after = raw[:section.end()], raw[section.end():]
     matches = list(re.finditer(r'^###\s+Q(\d+)[：:][^\n]*\n', after, re.M))
-    chunks, cursor = [render_md(before)], 0
+    annotations = course['source'].get('annotations', [])
+    chunks, cursor = [render_md(before, annotations)], 0
     for i, match in enumerate(matches):
         answer = course['questions'][i]['answer']
         start, end = match.start(), match.start() + len(answer)
-        chunks.append(render_md(after[cursor:start]))
+        chunks.append(render_md(after[cursor:start], annotations))
         label = match.group().strip().lstrip('#').strip()
         chunks.append('<details class="answer"><summary>' + html.escape(label) + '</summary>'
-                      + render_md(answer.split('\n', 1)[-1]) + '</details>')
+                      + render_md(answer.split('\n', 1)[-1], annotations) + '</details>')
         cursor = end
-    chunks.append(render_md(after[cursor:]))
+    chunks.append(render_md(after[cursor:], annotations))
     return ''.join(chunks)
 
 
@@ -211,14 +230,14 @@ def build(root):
         (out / 'courses' / f'{ep:03}.html').write_text(page(f'第{ep}期', content, '../', f'data-course="{ep}"'), encoding='utf-8')
         (out / 'originals' / f'{ep:03}.md').write_text(c['body'], encoding='utf-8')
     missing_label = '、'.join(map(str, report['missing_episodes']))
-    banner = f'<div class="notice"><strong>当前原文覆盖 {report["complete_count"]}/{report["expected_count"]} 期</strong><span>缺失期号：{missing_label}；未用摘要或新写内容代替。<a href="./status.html">查看详情 ↗</a></span></div>' if report['missing_episodes'] else '<div class="notice">历史课程完整性检查已通过。</div>'
+    banner = f'<div class="notice"><strong>当前原文覆盖 {report["complete_count"]}/{report["expected_count"]} 期</strong><span>缺失期号：{missing_label}；未用摘要或新写内容代替。<a href="./status.html">查看详情 ↗</a></span></div>' if report['missing_episodes'] else '<div class="notice">18期原始课程完整性检查已通过：162道原题与162份原答案。</div>'
     main = f'''<main class="library"><section class="hero"><div><p class="eyebrow">THE DAILY ALGORITHM LIBRARY</p><h1>读懂算法，<br>也读懂它的边界。</h1><p class="hero-copy">从一个寓言开始，把机制、证据与思考留在一起。<br>每天一点，反复回忆，逐渐形成自己的知识体系。</p></div><div class="hero-note"><span>今日学习节奏</span><strong>读 · 想 · 验</strong><p>先读故事 → 独立答题<br>展开原答案 → 间隔复习</p><a href="./review.html">去复习 →</a></div></section>{banner}<section class="catalog"><div class="section-top"><div><p class="eyebrow">YOUR COLLECTION</p><h2>课程目录 <span>{len(courses)} 期原文</span></h2></div><label class="search-box"><span>全文检索</span><input id="search" type="search" placeholder="搜索概念、正文、原题或答案…" autocomplete="off"></label></div><p id="search-status" class="muted" role="status">按期数倒序 · 原文与原题均可搜索</p><div id="course-grid" class="course-grid">{''.join(cards)}</div><p id="empty" hidden>没有找到匹配课程，换个关键词试试。</p></section></main>'''
     (out / 'index.html').write_text(page('课程目录', main), encoding='utf-8')
     review = '<main class="library"><p class="eyebrow">ACTIVE RECALL</p><h1>让记忆，走得更远。</h1><p class="muted">读完课程后，按D+1、D+7、D+30安排复习。先回答，再展开原答案。进度保存在当前浏览器，可导出备份。</p><div class="actions"><button id="export-progress">导出进度</button><label class="button secondary">导入进度<input id="import-progress" type="file" accept="application/json" hidden></label></div><p id="progress-status" role="status"></p><div id="review-list"></div></main>'
     (out / 'review.html').write_text(page('间隔复习', review), encoding='utf-8')
     missing = '、'.join(map(str, report['missing_episodes'])) or '无'
     rows = ''.join(f'<tr><td>第{c["episode"]}期</td><td>{c["date"]}</td><td>9 / 9</td><td><a href="./originals/{c["episode"]:03}.md">原文</a></td><td><code>{c["body_sha256"][:16]}</code></td></tr>' for c in courses)
-    status = f'''<main class="library"><p class="eyebrow">CONTENT & PROVENANCE</p><h1>内容与更新状态</h1><div class="notice"><strong>完整原文 {len(courses)} / {report['expected_count']} 期 · 原题{report['question_count']}道 / 原答案{report['answer_count']}份</strong><span>缺失期号：{missing}。原项目尚未恢复；此版本为可继续导入的恢复站点。</span></div><h2>自动更新边界</h2><p>ChatGPT每日10点任务的输出接入：<strong>尚未验证</strong>。网站构建成功与任务接入成功是两个独立状态。</p><p>GitHub Actions在北京时间10:15与10:45检查当天原文入站文件；本机跟进读取授权原聊天后提交。缺少当天原文、内容不完整或构建失败会停止发布并保留现有站点。</p><h2>最近一次自动入库</h2><p id="sync-status">正在读取入库证据…</p><p><a href="./sync.json">入库证据JSON</a> · <a href="https://github.com/tengtenglf/ai-algorithm-library/actions">GitHub Actions运行记录</a></p><h2>原始资料</h2><p>来源：原聊天 <a href="https://chatgpt.com/c/6ac9e367-6ea8-83ec-aeee-555083ffcfb7">每日 AI 算法寓言</a>。逐条保留可读消息正文，下载文件与校验哈希对应。未对课程中的研究事实作重新审校。</p><p>有 {report['unresolved_citations']} 个ChatGPT内部引用未解析，显示为“原聊天引用：未解析”，没有编造外部网址。课程中的外部网址只检查格式，网络可达性结果见交付报告。</p><div class="table-wrap"><table><thead><tr><th>课程</th><th>日期</th><th>原题 / 原答案</th><th>下载</th><th>SHA256前16位</th></tr></thead><tbody>{rows}</tbody></table></div><p><a href="./audit.json">下载内容审计JSON</a></p></main>'''
+    status = f'''<main class="library"><p class="eyebrow">CONTENT & PROVENANCE</p><h1>内容与更新状态</h1><div class="notice"><strong>完整原文 {len(courses)} / {report['expected_count']} 期 · 原题{report['question_count']}道 / 原答案{report['answer_count']}份</strong><span>缺失期号：{missing}。已按原聊天消息恢复课程；分段消息按原顺序无改写拼接并保留来源证据。原sandbox项目文件未取回。</span></div><h2>自动更新边界</h2><p>ChatGPT每日10点任务的输出接入：<strong>尚未验证</strong>。网站构建成功与任务接入成功是两个独立状态。</p><p>GitHub Actions在北京时间10:15与10:45检查当天原文入站文件；本机跟进读取授权原聊天后提交。缺少当天原文、内容不完整或构建失败会停止发布并保留现有站点。</p><h2>最近一次自动入库</h2><p id="sync-status">正在读取入库证据…</p><p><a href="./sync.json">入库证据JSON</a> · <a href="https://github.com/tengtenglf/ai-algorithm-library/actions">GitHub Actions运行记录</a></p><h2>原始资料</h2><p>来源：<a href="https://chatgpt.com/share/6ae04288-fa20-83ec-9a8d-b88f11e5a1f0">每日 AI 算法寓言 · 原聊天分享</a>。逐条保留可读消息正文，下载文件与校验哈希对应。未对课程中的研究事实作重新审校。</p><p>有 {report['unresolved_citations']} 个ChatGPT内部引用未解析，显示为“原聊天引用：未解析”，没有编造外部网址。课程中的外部网址只检查格式，网络可达性结果见交付报告。</p><div class="table-wrap"><table><thead><tr><th>课程</th><th>日期</th><th>原题 / 原答案</th><th>下载</th><th>SHA256前16位</th></tr></thead><tbody>{rows}</tbody></table></div><p><a href="./audit.json">下载内容审计JSON</a></p></main>'''
     (out / 'status.html').write_text(page('内容与更新状态', status), encoding='utf-8')
     (out / 'data.json').write_text(json.dumps(courses, ensure_ascii=False), encoding='utf-8')
     (out / 'audit.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

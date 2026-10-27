@@ -56,6 +56,130 @@
     "kind": "verbatim_chatgpt_message",
     "conversation_id": "6ac9e367-6ea8-83ec-aeee-555083ffcfb7",
     "message_id": "b9666561-61e6-4fd0-a86d-e453cb459c95",
-    "retrieved_at": "2026-10-27T11:20:25.726815+08:00"
+    "retrieved_at": "2026-10-27T11:20:25.726815+08:00",
+    "annotations": [
+      {
+        "marker": "url阅读原始论文https://arxiv.org/abs/2610.28543",
+        "markdown": "[阅读原始论文](https://arxiv.org/abs/2610.28543?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"0\"}",
+        "markdown": "[阅读原始论文](https://arxiv.org/abs/2610.28543?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "url阅读 HTML 全文https://arxiv.org/html/2610.28543v1",
+        "markdown": "[阅读 HTML 全文](https://arxiv.org/html/2610.28543v1?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"1\"}",
+        "markdown": "[阅读 HTML 全文](https://arxiv.org/html/2610.28543v1?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "citeturn132695view0",
+        "markdown": "([arXiv](https://arxiv.org/html/2610.28543v1))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"2\"}",
+        "markdown": "([arXiv](https://arxiv.org/html/2610.28543v1))"
+      },
+      {
+        "marker": "citeturn132695view0",
+        "markdown": "([arXiv](https://arxiv.org/html/2610.28543v1))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"3\"}",
+        "markdown": "([arXiv](https://arxiv.org/html/2610.28543v1))"
+      },
+      {
+        "marker": "citeturn291045view1",
+        "markdown": "([arXiv](https://arxiv.org/html/2610.28543v1))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"4\"}",
+        "markdown": "([arXiv](https://arxiv.org/html/2610.28543v1))"
+      },
+      {
+        "marker": "url1977 年原始论文https://doi.org/10.1016/0004-3702(77)90007-8",
+        "markdown": "[1977 年原始论文](https://doi.org/10.1016/0004-3702(77)90007-8?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"5\"}",
+        "markdown": "[1977 年原始论文](https://doi.org/10.1016/0004-3702(77)90007-8?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "citeturn866161search2",
+        "markdown": "([APICe](https://apice.unibo.it/bin/view/Publication/ConsistencyAij8?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"6\"}",
+        "markdown": "([APICe](https://apice.unibo.it/bin/view/Publication/ConsistencyAij8?utm_source=chatgpt.com))"
+      },
+      {
+        "marker": "url1993 年原始论文https://doi.org/10.1049/ip-f-2.1993.0015",
+        "markdown": "[1993 年原始论文](https://doi.org/10.1049/ip-f-2.1993.0015?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"7\"}",
+        "markdown": "[1993 年原始论文](https://doi.org/10.1049/ip-f-2.1993.0015?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlSequential Monte Carlo Methods in Practice，Springer，2001https://link.springer.com/book/10.1007/978-1-4757-3437-9",
+        "markdown": "[Sequential Monte Carlo Methods in Practice，Springer，2001](https://link.springer.com/book/10.1007/978-1-4757-3437-9?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"8\"}",
+        "markdown": "[Sequential Monte Carlo Methods in Practice，Springer，2001](https://link.springer.com/book/10.1007/978-1-4757-3437-9?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlBinary Discrete Diffusion，2026-10-20https://arxiv.org/abs/2610.28543",
+        "markdown": "[Binary Discrete Diffusion，2026-10-20](https://arxiv.org/abs/2610.28543?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"9\"}",
+        "markdown": "[Binary Discrete Diffusion，2026-10-20](https://arxiv.org/abs/2610.28543?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "url完整论文 HTMLhttps://arxiv.org/html/2610.28543v1",
+        "markdown": "[完整论文 HTML](https://arxiv.org/html/2610.28543v1?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"10\"}",
+        "markdown": "[完整论文 HTML](https://arxiv.org/html/2610.28543v1?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlMackworth：Consistency in Networks of Relations，1977https://doi.org/10.1016/0004-3702(77)90007-8",
+        "markdown": "[Mackworth：Consistency in Networks of Relations，1977](https://doi.org/10.1016/0004-3702(77)90007-8?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"11\"}",
+        "markdown": "[Mackworth：Consistency in Networks of Relations，1977](https://doi.org/10.1016/0004-3702(77)90007-8?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlUC Berkeley：Artificial Intelligence 约束满足章节https://aima.cs.berkeley.edu/~russell/aima/global-algorithms.pdf",
+        "markdown": "[UC Berkeley：Artificial Intelligence 约束满足章节](https://aima.cs.berkeley.edu/~russell/aima/global-algorithms.pdf?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"12\"}",
+        "markdown": "[UC Berkeley：Artificial Intelligence 约束满足章节](https://aima.cs.berkeley.edu/~russell/aima/global-algorithms.pdf?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlGordon 等：Bootstrap Particle Filter，1993https://doi.org/10.1049/ip-f-2.1993.0015",
+        "markdown": "[Gordon 等：Bootstrap Particle Filter，1993](https://doi.org/10.1049/ip-f-2.1993.0015?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"13\"}",
+        "markdown": "[Gordon 等：Bootstrap Particle Filter，1993](https://doi.org/10.1049/ip-f-2.1993.0015?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": "urlSequential Monte Carlo Methods in Practice，2001https://link.springer.com/book/10.1007/978-1-4757-3437-9",
+        "markdown": "[Sequential Monte Carlo Methods in Practice，2001](https://link.springer.com/book/10.1007/978-1-4757-3437-9?utm_source=chatgpt.com)"
+      },
+      {
+        "marker": ":chatgpt-content-reference{index=\"14\"}",
+        "markdown": "[Sequential Monte Carlo Methods in Practice，2001](https://link.springer.com/book/10.1007/978-1-4757-3437-9?utm_source=chatgpt.com)"
+      }
+    ],
+    "share_url": "https://chatgpt.com/share/6ae04288-fa20-83ec-9a8d-b88f11e5a1f0",
+    "share_body_sha256": "4158183af72d940eb2f1c25d60e5f8132f29e784a6608ddf355ebee4f2fa80a0"
   }
 }
