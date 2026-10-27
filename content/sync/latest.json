@@ -1,10 +1,13 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-27T14:37:35.991059+08:00",
+  "checked_at": "2026-10-27T15:36:53.261935+08:00",
   "target_date": "2026-10-27",
   "source_conversation_id": "6ac9e367-6ea8-83ec-aeee-555083ffcfb7",
   "source_message_ids": [
     "8d545aca-f23d-44c8-a509-777c39188361"
+  ],
+  "source_delivery_ids": [
+    null
   ],
   "source_episodes": [
     18
@@ -17,5 +20,5 @@
   "complete_count": 18,
   "expected_count": 18,
   "missing_episodes": [],
-  "chatgpt_task_direct_output": "not_verified"
+  "chatgpt_task_direct_output": "cloud_transport_verified"
 }
