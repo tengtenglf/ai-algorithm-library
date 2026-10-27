@@ -2,17 +2,34 @@
   "schema_version": 1,
   "checked_on": "2026-10-27",
   "timezone": "Asia/Shanghai",
-  "status": "cloud_transport_verified",
+  "status": "cloud_full_original_sync_verified",
   "automation_id": "6ac9e53a5cdc8191b955c5a84cdc3c2f",
   "schedule": "daily 10:00 Asia/Shanghai",
   "execution": "hosted original ChatGPT task, manually run from Scheduled",
-  "commit_sha": "89a300620bac0bc92efae27344a6af00235ba324",
+  "commit_sha": "7935ae90235d7c11a096f93a5cd3b5a92f4fb7d9",
   "receipt": "content/cloud-runs/2026-10-27.json",
-  "workflow_url": "https://github.com/tengtenglf/ai-algorithm-library/actions/runs/40467367128",
+  "workflow_url": "https://github.com/tengtenglf/ai-algorithm-library/actions/runs/40470034286",
   "build": "success",
   "deploy": "success",
-  "verified": ["cloud task read original episode 18", "cloud task wrote GitHub receipt", "Actions imported existing original idempotently", "history gate, tests, links and Pages deployment passed"],
-  "not_yet_observed": ["next natural daily 10:00 trigger", "first newly generated future course through the cloud delivery envelope"],
+  "verified": [
+    "hosted course task read episode 18 full original",
+    "cloud execution re-exported the complete original inbox payload through GitHub update_file",
+    "independent before/after comparison preserved every existing message field and full body",
+    "Actions import, tests, full history gate, links and Pages deployment passed",
+    "live website returned 18 complete courses and 162 questions / 162 answers with matching episode 18 body SHA256"
+  ],
+  "not_yet_observed": [
+    "next natural daily 10:00 trigger",
+    "first newly generated future course through the cloud delivery envelope"
+  ],
   "credentials_required_from_user": false,
-  "local_computer_required": false
+  "local_computer_required": false,
+  "full_original_inbox": "content/inbox/2026-10-27.json",
+  "full_original_blob_sha": "748650a11b7df62e31762608bb2ef5a89b74d125",
+  "source_message_id": "8d545aca-f23d-44c8-a509-777c39188361",
+  "source_body_sha256": "e982a1506c205b230f4ce7825aa6339af65b8051b6d2950a0ea20bcb0cd3e476",
+  "original_messages_unchanged": true,
+  "github_authorization": "user approved only the original course conversation; applied conversation scope and approved the flagged test write",
+  "approval_boundary": "Future platform content reviews or expired GitHub authorization may still pause execution; unattended operation is not an unconditional guarantee",
+  "local_fallback": "ai-2 PAUSED"
 }
