@@ -1,0 +1,150 @@
+{
+  "checked_on": "2026-10-27",
+  "method": "HEAD with redirects, curl 18-second maximum; a failure is not proof a paper is absent",
+  "results": [
+    {
+      "url": "https://aima.cs.berkeley.edu/~russell/aima/global-algorithms.pdf?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://arxiv.org/abs/2506.22405?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://arxiv.org/abs/2610.28543?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://arxiv.org/abs/2610.31642?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://arxiv.org/html/2610.28543v1?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://arxiv.org/html/2610.31642v1?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://chatgpt.com/c/6ac9e367-6ea8-83ec-aeee-555083ffcfb7",
+      "http_status": "403",
+      "reachable": false,
+      "error": null
+    },
+    {
+      "url": "https://doi.org/10.1007/BF01588971?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://doi.org/10.1016/0004-3702(77)90007-8?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://doi.org/10.1049/ip-f-2.1993.0015?utm_source=chatgpt.com",
+      "http_status": "403",
+      "reachable": false,
+      "error": null
+    },
+    {
+      "url": "https://doi.org/10.1098/rstl.1763.0053?utm_source=chatgpt.com",
+      "http_status": "403",
+      "reachable": false,
+      "error": null
+    },
+    {
+      "url": "https://doi.org/10.1145/1465482.1465560?utm_source=chatgpt.com",
+      "http_status": "403",
+      "reachable": false,
+      "error": null
+    },
+    {
+      "url": "https://doi.org/10.1145/362686.362692?utm_source=chatgpt.com",
+      "http_status": "403",
+      "reachable": false,
+      "error": null
+    },
+    {
+      "url": "https://doi.org/10.1287/moor.3.3.177?utm_source=chatgpt.com",
+      "http_status": "403",
+      "reachable": false,
+      "error": null
+    },
+    {
+      "url": "https://doi.org/10.1287/trsc.1050.0127?utm_source=chatgpt.com",
+      "http_status": "403",
+      "reachable": false,
+      "error": null
+    },
+    {
+      "url": "https://doi.org/10.1609/aaai.v29i1.9486?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://github.com/brianberns/CFR-Explained?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://github.com/google/guava/blob/master/guava/src/com/google/common/hash/BloomFilter.java?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://github.com/ml-explore/mlx?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://link.springer.com/book/10.1007/978-1-4757-3437-9?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://machinelearning.apple.com/research/mlx-distributed-inference?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://proceedings.neurips.cc/paper/2007/hash/08d98638c6fcd194a4b1e6992063e944-Abstract.html?utm_source=chatgpt.com",
+      "http_status": "200",
+      "reachable": true,
+      "error": null
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/research/publication/sequential-diagnosis-with-language-models/?utm_source=chatgpt.com",
+      "http_status": "403",
+      "reachable": false,
+      "error": null
+    },
+    {
+      "url": "https://www.science.org/doi/10.1126/science.aeh7930?utm_source=chatgpt.com",
+      "http_status": "403",
+      "reachable": false,
+      "error": null
+    }
+  ]
+}

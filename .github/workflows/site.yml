@@ -1,0 +1,75 @@
+name: Import original course and deploy Pages
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['content/sync/**']
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '15,45 2 * * *'
+concurrency:
+  group: library-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -r requirements.txt
+      - name: Import today's original messages
+        if: github.event_name != 'pull_request'
+        run: python scripts/update.py --report "$RUNNER_TEMP/sync-report.json"
+      - run: python -m unittest discover -s tests -v
+      - run: node --test tests/review.test.cjs
+      - run: python scripts/library.py audit
+      - name: Enforce complete history when enabled
+        if: vars.REQUIRE_COMPLETE_HISTORY == 'true'
+        run: python scripts/library.py audit --require-complete
+      - run: python scripts/library.py build
+      - run: python scripts/library.py links
+      - name: Preserve imported originals and ledger
+        if: github.event_name != 'pull_request'
+        run: |
+          git add content/courses content/sync
+          if ! git diff --cached --quiet; then
+            git -c user.name='library-bot' -c user.email='library-bot@users.noreply.github.com' commit -m 'Import validated original course and sync evidence'
+            git push origin HEAD:main
+          fi
+      - name: Publish run summary
+        if: github.event_name != 'pull_request'
+        run: cat "$RUNNER_TEMP/sync-report.json" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          name: original-course-sync-evidence
+          path: ${{ runner.temp }}/sync-report.json
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Deploy verified content
+        id: deployment
+        uses: actions/deploy-pages@v4
