@@ -28,7 +28,7 @@ def sha(text):
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
 
-def parse_course(raw, message_id, conversation_id):
+def parse_course(raw, message_id, conversation_id, delivery=None):
     ep = re.search(EPISODE, raw, re.M)
     day = re.search(r'(20\d\d)\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日', raw)
     title = re.search(r'^#{2,3}\s*今日主题[：:]\s*(.+)', raw, re.M)
@@ -39,6 +39,19 @@ def parse_course(raw, message_id, conversation_id):
     if not 1 <= episode <= 99999:
         raise ValueError('期号超出范围')
     when = date(*map(int, day.groups())).isoformat()
+    source = {'kind': 'verbatim_chatgpt_message', 'conversation_id': conversation_id,
+              'message_id': message_id, 'retrieved_at': datetime.now(ZoneInfo('Asia/Shanghai')).isoformat()}
+    if delivery is not None:
+        # The producer cannot know its final chat-message UUID before publishing.
+        # Keep a separate deterministic delivery key rather than inventing a UUID.
+        task = '6ac9e53a5cdc8191b955c5a84cdc3c2f'
+        if (not isinstance(delivery, dict) or message_id is not None
+                or conversation_id != '6ac9e367-6ea8-83ec-aeee-555083ffcfb7'
+                or delivery != {'automation_id': task, 'id': f'{task}:{when}'}):
+            raise ValueError('云端投递来源不匹配；日期、原任务、原聊天与独立投递编号必须一致，禁止伪造消息ID')
+        source.update(kind='verbatim_chatgpt_task_output', delivery=delivery)
+    elif not isinstance(message_id, str) or not message_id.strip():
+        raise ValueError('原消息ID缺失；云端生成输出必须提供独立delivery来源')
     closing = re.search(r'第\s*0?' + str(episode) + r'\s*期[^\n]{0,4}完成', raw[-700:])
     # These two historical editions predate the later numbered closing style.
     # They still must pass the same nine original Q/A checks below.
@@ -69,8 +82,7 @@ def parse_course(raw, message_id, conversation_id):
         pairs.append({'id': i+1, 'question': question, 'answer': answer})
     return {'schema_version': 1, 'episode': episode, 'date': when, 'title': title.group(1),
             'body': raw, 'body_sha256': sha(raw), 'questions': pairs,
-            'source': {'kind': 'verbatim_chatgpt_message', 'conversation_id': conversation_id,
-                       'message_id': message_id, 'retrieved_at': datetime.now(ZoneInfo('Asia/Shanghai')).isoformat()}}
+            'source': source}
 
 
 def import_messages(root, messages, conversation_id):
@@ -80,7 +92,7 @@ def import_messages(root, messages, conversation_id):
         raw = message.get('text', '')
         if not re.search(EPISODE, raw, re.M):
             continue
-        course = parse_course(raw, message['id'], conversation_id)
+        course = parse_course(raw, message['id'], conversation_id, message.get('delivery'))
         for key in ['annotations', 'message_parts', 'share_url']:
             if key in message:
                 course['source'][key] = message[key]
@@ -126,7 +138,7 @@ def load_courses(root):
     courses = []
     for path in sorted((root / 'content/courses').glob('*.json')):
         course = json.loads(path.read_text(encoding='utf-8'))
-        fresh = parse_course(course['body'], course['source']['message_id'], course['source']['conversation_id'])
+        fresh = parse_course(course['body'], course['source']['message_id'], course['source']['conversation_id'], course['source'].get('delivery'))
         for key in ['episode', 'date', 'title', 'body_sha256', 'questions']:
             if fresh[key] != course[key]:
                 raise ValueError(f'原文与派生字段不一致：{path.name}/{key}')
@@ -141,12 +153,15 @@ def audit(root, require_complete=False):
     ids = [x['episode'] for x in courses]
     expected = max([18] + ids)
     missing = sorted(set(range(1, expected + 1)) - set(ids))
+    evidence = root / 'content/cloud-verification.json'
+    cloud = json.loads(evidence.read_text(encoding='utf-8')) if evidence.exists() else {}
     result = {'expected_count': expected, 'complete_count': len(courses),
               'episodes': ids, 'missing_episodes': missing,
               'question_count': sum(len(x['questions']) for x in courses),
               'answer_count': sum(len(x['questions']) for x in courses),
               'unresolved_citations': sum(len(re.findall(r'::?chatgpt-content-reference\{[^}]*\}|\ue200[^\ue201]*\ue201', resolve_annotations(x['body'], x['source'].get('annotations', [])))) for x in courses),
-              'chatgpt_task_output_bridge': 'not_verified',
+              'chatgpt_task_output_bridge': cloud.get('status', 'not_verified'),
+              'cloud_verification': cloud,
               'source_project_recovered': False}
     if require_complete and missing:
         raise ValueError(f'完整性验收未通过：缺少第 {missing} 期')
@@ -230,17 +245,18 @@ def build(root):
         (out / 'courses' / f'{ep:03}.html').write_text(page(f'第{ep}期', content, '../', f'data-course="{ep}"'), encoding='utf-8')
         (out / 'originals' / f'{ep:03}.md').write_text(c['body'], encoding='utf-8')
     missing_label = '、'.join(map(str, report['missing_episodes']))
-    banner = f'<div class="notice"><strong>当前原文覆盖 {report["complete_count"]}/{report["expected_count"]} 期</strong><span>缺失期号：{missing_label}；未用摘要或新写内容代替。<a href="./status.html">查看详情 ↗</a></span></div>' if report['missing_episodes'] else '<div class="notice">18期原始课程完整性检查已通过：162道原题与162份原答案。</div>'
+    banner = f'<div class="notice"><strong>当前原文覆盖 {report["complete_count"]}/{report["expected_count"]} 期</strong><span>缺失期号：{missing_label}；未用摘要或新写内容代替。<a href="./status.html">查看详情 ↗</a></span></div>' if report['missing_episodes'] else f'<div class="notice">{report["complete_count"]}期原始课程完整性检查已通过：{report["question_count"]}道原题与{report["answer_count"]}份原答案。</div>'
     main = f'''<main class="library"><section class="hero"><div><p class="eyebrow">THE DAILY ALGORITHM LIBRARY</p><h1>读懂算法，<br>也读懂它的边界。</h1><p class="hero-copy">从一个寓言开始，把机制、证据与思考留在一起。<br>每天一点，反复回忆，逐渐形成自己的知识体系。</p></div><div class="hero-note"><span>今日学习节奏</span><strong>读 · 想 · 验</strong><p>先读故事 → 独立答题<br>展开原答案 → 间隔复习</p><a href="./review.html">去复习 →</a></div></section>{banner}<section class="catalog"><div class="section-top"><div><p class="eyebrow">YOUR COLLECTION</p><h2>课程目录 <span>{len(courses)} 期原文</span></h2></div><label class="search-box"><span>全文检索</span><input id="search" type="search" placeholder="搜索概念、正文、原题或答案…" autocomplete="off"></label></div><p id="search-status" class="muted" role="status">按期数倒序 · 原文与原题均可搜索</p><div id="course-grid" class="course-grid">{''.join(cards)}</div><p id="empty" hidden>没有找到匹配课程，换个关键词试试。</p></section></main>'''
     (out / 'index.html').write_text(page('课程目录', main), encoding='utf-8')
     review = '<main class="library"><p class="eyebrow">ACTIVE RECALL</p><h1>让记忆，走得更远。</h1><p class="muted">读完课程后，按D+1、D+7、D+30安排复习。先回答，再展开原答案。进度保存在当前浏览器，可导出备份。</p><div class="actions"><button id="export-progress">导出进度</button><label class="button secondary">导入进度<input id="import-progress" type="file" accept="application/json" hidden></label></div><p id="progress-status" role="status"></p><div id="review-list"></div></main>'
     (out / 'review.html').write_text(page('间隔复习', review), encoding='utf-8')
     missing = '、'.join(map(str, report['missing_episodes'])) or '无'
     rows = ''.join(f'<tr><td>第{c["episode"]}期</td><td>{c["date"]}</td><td>9 / 9</td><td><a href="./originals/{c["episode"]:03}.md">原文</a></td><td><code>{c["body_sha256"][:16]}</code></td></tr>' for c in courses)
-    status = f'''<main class="library"><p class="eyebrow">CONTENT & PROVENANCE</p><h1>内容与更新状态</h1><div class="notice"><strong>完整原文 {len(courses)} / {report['expected_count']} 期 · 原题{report['question_count']}道 / 原答案{report['answer_count']}份</strong><span>缺失期号：{missing}。已按原聊天消息恢复课程；分段消息按原顺序无改写拼接并保留来源证据。原sandbox项目文件未取回。</span></div><h2>自动更新边界</h2><p>ChatGPT每日10点任务的输出接入：<strong>尚未验证</strong>。网站构建成功与任务接入成功是两个独立状态。</p><p>GitHub Actions在北京时间10:15与10:45检查当天原文入站文件；本机跟进读取授权原聊天后提交。缺少当天原文、内容不完整或构建失败会停止发布并保留现有站点。</p><h2>最近一次自动入库</h2><p id="sync-status">正在读取入库证据…</p><p><a href="./sync.json">入库证据JSON</a> · <a href="https://github.com/tengtenglf/ai-algorithm-library/actions">GitHub Actions运行记录</a></p><h2>原始资料</h2><p>来源：<a href="https://chatgpt.com/share/6ae04288-fa20-83ec-9a8d-b88f11e5a1f0">每日 AI 算法寓言 · 原聊天分享</a>。逐条保留可读消息正文，下载文件与校验哈希对应。未对课程中的研究事实作重新审校。</p><p>有 {report['unresolved_citations']} 个ChatGPT内部引用未解析，显示为“原聊天引用：未解析”，没有编造外部网址。课程中的外部网址只检查格式，网络可达性结果见交付报告。</p><div class="table-wrap"><table><thead><tr><th>课程</th><th>日期</th><th>原题 / 原答案</th><th>下载</th><th>SHA256前16位</th></tr></thead><tbody>{rows}</tbody></table></div><p><a href="./audit.json">下载内容审计JSON</a></p></main>'''
+    status = f'''<main class="library"><p class="eyebrow">CONTENT & PROVENANCE</p><h1>内容与更新状态</h1><div class="notice"><strong>完整原文 {len(courses)} / {report['expected_count']} 期 · 原题{report['question_count']}道 / 原答案{report['answer_count']}份</strong><span>缺失期号：{missing}。已按原聊天消息恢复课程；分段消息按原顺序无改写拼接并保留来源证据。原sandbox项目文件未取回。</span></div><h2>自动更新边界</h2><p>原10点任务的云端读写与发布已于2026-10-27实际运行通过；已配置每天生成后直接提交GitHub。<strong>下一次10点自然定时触发仍待观测。</strong></p><p>GitHub Actions在北京时间10:15与10:45检查当天原文入站文件；原任务在同一聊天生成完整课程后直接提交，不依赖用户电脑开机。缺少当天原文、内容不完整或构建失败会停止发布并保留现有站点。</p><p><a href="https://github.com/tengtenglf/ai-algorithm-library/actions/runs/40467367128">云端试运行与部署证据</a> · <a href="./cloud-verification.json">验收范围与限制</a></p><h2>最近一次自动入库</h2><p id="sync-status">正在读取入库证据…</p><p><a href="./sync.json">入库证据JSON</a> · <a href="https://github.com/tengtenglf/ai-algorithm-library/actions">GitHub Actions运行记录</a></p><h2>原始资料</h2><p>来源：<a href="https://chatgpt.com/share/6ae04288-fa20-83ec-9a8d-b88f11e5a1f0">每日 AI 算法寓言 · 原聊天分享</a>。逐条保留可读消息正文，下载文件与校验哈希对应。未对课程中的研究事实作重新审校。</p><p>有 {report['unresolved_citations']} 个ChatGPT内部引用未解析，显示为“原聊天引用：未解析”，没有编造外部网址。课程中的外部网址只检查格式，网络可达性结果见交付报告。</p><div class="table-wrap"><table><thead><tr><th>课程</th><th>日期</th><th>原题 / 原答案</th><th>下载</th><th>SHA256前16位</th></tr></thead><tbody>{rows}</tbody></table></div><p><a href="./audit.json">下载内容审计JSON</a></p></main>'''
     (out / 'status.html').write_text(page('内容与更新状态', status), encoding='utf-8')
     (out / 'data.json').write_text(json.dumps(courses, ensure_ascii=False), encoding='utf-8')
     (out / 'audit.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    (out / 'cloud-verification.json').write_text(json.dumps(report['cloud_verification'], ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     ledger = root / 'content/sync/latest.json'
     if ledger.exists():
         shutil.copy2(ledger, out / 'sync.json')

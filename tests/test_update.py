@@ -37,3 +37,38 @@ class UpdateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder)
             with self.assertRaises(ValueError):update.sync(root,'2026-10-10',root/'README.md')
+
+    def test_cloud_delivery_preserves_body_without_inventing_message_id(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);source=self.inbox(root,lesson(19))
+            payload=json.loads(source.read_text())
+            payload['conversation_id']='6ac9e367-6ea8-83ec-aeee-555083ffcfb7'
+            message=payload['messages'][0]
+            message['id']=None
+            message['delivery']={'automation_id':'6ac9e53a5cdc8191b955c5a84cdc3c2f',
+                                 'id':'6ac9e53a5cdc8191b955c5a84cdc3c2f:2026-10-10'}
+            source.write_text(json.dumps(payload))
+            report=update.sync(root,'2026-10-10',source)
+            course=json.loads((root/'content/courses/019.json').read_text())
+            self.assertEqual(course['body'],lesson(19))
+            self.assertEqual(course['source']['kind'],'verbatim_chatgpt_task_output')
+            self.assertIsNone(course['source']['message_id'])
+            self.assertEqual(course['source']['delivery'],message['delivery'])
+            self.assertEqual(report['source_message_ids'],[None])
+            self.assertEqual(report['source_delivery_ids'],[message['delivery']['id']])
+            self.assertEqual(update.sync(root,'2026-10-10',source)['imported'],0)
+            message['delivery']['id']='6ac9e53a5cdc8191b955c5a84cdc3c2f:2026-10-11'
+            source.write_text(json.dumps(payload))
+            with self.assertRaises(ValueError):update.sync(root,'2026-10-10',source)
+
+    def test_cloud_delivery_rejects_missing_provenance_and_fabricated_message_id(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);source=self.inbox(root,lesson(19))
+            payload=json.loads(source.read_text());payload['messages'][0]['id']=None
+            source.write_text(json.dumps(payload))
+            with self.assertRaises(ValueError):update.sync(root,'2026-10-10',source)
+            payload['messages'][0]['id']='made-up-uuid'
+            payload['messages'][0]['delivery']={'automation_id':'6ac9e53a5cdc8191b955c5a84cdc3c2f','id':'6ac9e53a5cdc8191b955c5a84cdc3c2f:2026-10-10'}
+            source.write_text(json.dumps(payload))
+            with self.assertRaises(ValueError):update.sync(root,'2026-10-10',source)
+            self.assertFalse((root/'content/courses').exists())

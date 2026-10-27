@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "status": "cloud_transport_verified",
+  "automation_id": "6ac9e53a5cdc8191b955c5a84cdc3c2f",
+  "schedule": "daily 10:00 Asia/Shanghai",
+  "execution": "hosted original ChatGPT task, manually run from Scheduled",
+  "commit_sha": "89a300620bac0bc92efae27344a6af00235ba324",
+  "receipt": "content/cloud-runs/2026-10-27.json",
+  "workflow_url": "https://github.com/tengtenglf/ai-algorithm-library/actions/runs/40467367128",
+  "build": "success",
+  "deploy": "success",
+  "verified": ["cloud task read original episode 18", "cloud task wrote GitHub receipt", "Actions imported existing original idempotently", "history gate, tests, links and Pages deployment passed"],
+  "not_yet_observed": ["next natural daily 10:00 trigger", "first newly generated future course through the cloud delivery envelope"],
+  "credentials_required_from_user": false,
+  "local_computer_required": false
+}

@@ -17,7 +17,7 @@ def sync(root,target_date,source_path):
     payload=json.loads(source_path.read_text(encoding='utf-8'))
     messages,conversation=library.messages_from_payload(payload)
     if conversation=='unknown':raise ValueError('原聊天ID缺失')
-    parsed=[library.parse_course(m['text'],m['id'],conversation) for m in messages]
+    parsed=[library.parse_course(m['text'],m['id'],conversation,m.get('delivery')) for m in messages]
     if not parsed or any(c['date']!=target_date for c in parsed):
         raise ValueError(f'未取得北京时间{target_date}的完整课程；保留现有站点')
     added=library.import_messages(root,messages,conversation)
@@ -25,12 +25,13 @@ def sync(root,target_date,source_path):
     return {'schema_version':1,'checked_at':datetime.now(ZoneInfo('Asia/Shanghai')).isoformat(),
             'target_date':target_date,'source_conversation_id':conversation,
             'source_message_ids':[c['source']['message_id'] for c in parsed],
+            'source_delivery_ids':[c['source'].get('delivery',{}).get('id') for c in parsed],
             'source_episodes':[c['episode'] for c in parsed],
             'source_sha256':[c['body_sha256'] for c in parsed],
             'processed':len(parsed),'imported':added,
             'complete_count':report['complete_count'],'expected_count':report['expected_count'],
             'missing_episodes':report['missing_episodes'],
-            'chatgpt_task_direct_output':'not_verified'}
+            'chatgpt_task_direct_output':report['chatgpt_task_output_bridge']}
 
 def main():
     p=argparse.ArgumentParser()
@@ -43,7 +44,8 @@ def main():
     Path(args.report).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     ledger=ROOT/'content/sync/latest.json'
     old=json.loads(ledger.read_text()) if ledger.exists() else {}
-    if report['imported'] or old.get('complete_count')!=report['complete_count']:
+    if (report['imported'] or old.get('complete_count')!=report['complete_count']
+            or old.get('chatgpt_task_direct_output')!=report['chatgpt_task_direct_output']):
         ledger.parent.mkdir(parents=True,exist_ok=True)
         ledger.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report,ensure_ascii=False))
