@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "kind": "cloud_transport_probe",
+  "automation_id": "6ac9e53a5cdc8191b955c5a84cdc3c2f",
+  "conversation_id": "6ac9e367-6ea8-83ec-aeee-555083ffcfb7",
+  "target_date": "2026-10-27",
+  "source_message_id": "8d545aca-f23d-44c8-a509-777c39188361",
+  "source_episode": 18,
+  "source_body_sha256": "e982a1506c205b230f4ce7825aa6339af65b8051b6d2950a0ea20bcb0cd3e476",
+  "note": "本次由已托管的原定时任务读取原课程并执行去重传输验证；未重新生成第19期。"
+}
