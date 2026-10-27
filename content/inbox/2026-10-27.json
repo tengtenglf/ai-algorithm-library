@@ -10,5 +10,11 @@
     "method": "authorized_read_thread",
     "retrieved_on": "2026-10-27",
     "verification_run": "user_requested_real_update"
+  },
+  "cloud_transport_reexport": {
+    "automation_id": "6ac9e53a5cdc8191b955c5a84cdc3c2f",
+    "target_date": "2026-10-27",
+    "kind": "full_original_payload_reexport",
+    "source_body_sha256": "e982a1506c205b230f4ce7825aa6339af65b8051b6d2950a0ea20bcb0cd3e476"
   }
 }
