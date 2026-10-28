@@ -14,6 +14,8 @@ def sync(root,target_date,source_path):
     inbox=(root/'content/inbox').resolve()
     if not source_path.is_relative_to(inbox):
         raise ValueError('来源必须位于content/inbox，不能读取任意仓库文件')
+    if source_path.name != f'{target_date}.json':
+        raise ValueError('入站文件名必须与目标日期一致')
     payload=json.loads(source_path.read_text(encoding='utf-8'))
     messages,conversation=library.messages_from_payload(payload)
     if conversation=='unknown':raise ValueError('原聊天ID缺失')
@@ -36,11 +38,25 @@ def sync(root,target_date,source_path):
 def main():
     p=argparse.ArgumentParser()
     p.add_argument('--source',default='')
+    p.add_argument('--date',default='',help='补投日期YYYY-MM-DD；留空检查北京时间今天')
     p.add_argument('--report',required=True)
     args=p.parse_args()
     today=datetime.now(ZoneInfo('Asia/Shanghai')).date().isoformat()
-    source=ROOT/args.source if args.source else ROOT/'content/inbox'/f'{today}.json'
-    report=sync(ROOT,today,source)
+    target=args.date or today
+    source=ROOT/args.source if args.source else ROOT/'content/inbox'/f'{target}.json'
+    try:
+        if date.fromisoformat(target).isoformat()!=target or target>today:
+            raise ValueError('目标日期必须为YYYY-MM-DD，且不能晚于北京时间今天')
+        report=sync(ROOT,target,source)
+        report['status']='success'
+    except (ValueError,OSError,KeyError,TypeError) as error:
+        report={'schema_version':1,'checked_at':datetime.now(ZoneInfo('Asia/Shanghai')).isoformat(),
+                'target_date':target,'status':'failed',
+                'error_code':'missing_inbox' if isinstance(error,FileNotFoundError) and error.filename==str(source.resolve()) else 'invalid_source_or_sync',
+                'error':str(error)}
+        Path(args.report).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+        print(f'ERROR: {error}',file=sys.stderr)
+        return 1
     Path(args.report).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     ledger=ROOT/'content/sync/latest.json'
     old=json.loads(ledger.read_text()) if ledger.exists() else {}
@@ -49,8 +65,9 @@ def main():
         ledger.parent.mkdir(parents=True,exist_ok=True)
         ledger.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report,ensure_ascii=False))
+    return 0
 
 if __name__=='__main__':
-    try:main()
+    try:sys.exit(main())
     except (ValueError,OSError,KeyError,TypeError) as e:
         print(f'ERROR: {e}',file=sys.stderr);sys.exit(1)

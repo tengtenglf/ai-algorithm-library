@@ -5,8 +5,16 @@ on:
     paths-ignore: ['content/sync/**']
   pull_request:
   workflow_dispatch:
+    inputs:
+      target_date:
+        description: 'Original inbox date YYYY-MM-DD (empty = today in Asia/Shanghai)'
+        required: false
+        default: ''
+        type: string
   schedule:
-    - cron: '15,45 2 * * *'
+    # Re-register the two original retry times; cron is UTC.
+    - cron: '15 2 * * *'
+    - cron: '45 2 * * *'
 concurrency:
   group: library-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
   cancel-in-progress: false
@@ -30,7 +38,9 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - name: Import today's original messages
         if: github.event_name != 'pull_request'
-        run: python scripts/update.py --report "$RUNNER_TEMP/sync-report.json"
+        env:
+          TARGET_DATE: ${{ inputs.target_date }}
+        run: python scripts/update.py --date "$TARGET_DATE" --report "$RUNNER_TEMP/sync-report.json"
       - run: python -m unittest discover -s tests -v
       - run: node --test tests/review.test.cjs
       - run: python scripts/library.py audit
@@ -47,10 +57,15 @@ jobs:
             git push origin HEAD:main
           fi
       - name: Publish run summary
-        if: github.event_name != 'pull_request'
-        run: cat "$RUNNER_TEMP/sync-report.json" >> "$GITHUB_STEP_SUMMARY"
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          if [ -f "$RUNNER_TEMP/sync-report.json" ]; then
+            cat "$RUNNER_TEMP/sync-report.json" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Import report unavailable; inspect the failed setup/import step.' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/upload-artifact@v4
-        if: github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request'
         with:
           name: original-course-sync-evidence
           path: ${{ runner.temp }}/sync-report.json
