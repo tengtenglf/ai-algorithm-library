@@ -36,4 +36,9 @@ Actions的 **Run workflow** 现在可填写`target_date`，明确指定已经归
 
 失败运行也上传`original-course-sync-evidence`并在Summary显示`status=failed`和失败原因；成功入库账本及旧站保持原样。`audit.json`检查已归档历史完整性，不证明今天已经到件，必须同时核对`sync.json.target_date`、当天inbox和实际运行结果。
 
-若原ChatGPT任务停在GitHub操作的安全审批，必须由用户在该操作上审阅后继续；本仓库和Actions不能绕过平台审批。原任务中2026-10-27的单次重投分支应从长期说明移除，保留每日规则。原文已生成时只能复用同一份全文，不重新生成替代版。仅当原文及来源可读取时才能创建缺失的inbox；无法读取时停止并保留旧站，不要求令牌。
+若原ChatGPT任务停在GitHub操作的安全审批，必须由用户在该操作上审阅后继续；本仓库和Actions不能绕过平台审批。2026-10-28在原任务编辑器核实：当前长期说明已无2026-10-27单次重投分支，教学及每日归档规则完整，本次未改写任务说明。原文已生成时只能复用同一份全文，不重新生成替代版。仅当原文及来源可读取时才能创建缺失的inbox；无法读取时停止并保留旧站，不要求令牌。
+
+
+同日进一步在ChatGPT Scheduled确认原任务`6ac9e53a5cdc8191b955c5a84cdc3c2f`处于已暂停；已恢复为活跃，界面显示下一次为北京时间2026-10-29 10:00。暂停发生的时间和原因不可从当前界面追溯，不能据此断言当天10点的完整调度历史。
+
+修复提交`bb671a5d2359fe78c11037754ceea1b71f4dea3a`的[push验收](https://github.com/tengtenglf/ai-algorithm-library/actions/runs/40648162088)明确拒绝缺失的2026-10-28原文，Summary及诊断附件成功保存；[指定2026-10-27的恢复验收](https://github.com/tengtenglf/ai-algorithm-library/actions/runs/40648332615)的build和deploy均成功，23项Python测试、2项Node测试及完整历史校验通过。线上audit.json、sync.json和data.json均返回HTTP 200，18期正文与162问/162答逐项与修复前原档一致；sync.json.target_date仍为2026-10-27。这是已有原文的发布验证，不是2026-10-28新课发布。未生成替代课程，2026-10-28原文到件以及下一次自然定时触发仍待验证。
