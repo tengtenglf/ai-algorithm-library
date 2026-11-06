@@ -11,6 +11,38 @@ update=importlib.util.module_from_spec(spec)
 if p.exists(): spec.loader.exec_module(update)
 
 class UpdateTests(unittest.TestCase):
+    def test_late_previous_inbox_is_imported_with_today_and_retry_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);source=self.inbox(root,lesson(18))
+            previous=source.with_name('2026-10-09.json')
+            previous.write_text(json.dumps({'conversation_id':'conv','messages':[{'id':'previous','text':lesson(17).replace('2026 年 10 月 10 日','2026 年 10 月 9 日')}]}))
+            source.with_name('2026-10-11.json').write_text('invalid future payload')
+            report=root/'report.json';args=['--date','2026-10-10','--report',str(report)]
+            self.assertEqual(self.run_main(root,args),0)
+            self.assertTrue((root/'content/courses/017.json').exists())
+            result=json.loads(report.read_text())
+            self.assertEqual(result['backfilled_dates'],['2026-10-09'])
+            self.assertEqual(result['imported'],1)
+            self.assertEqual(result['source_episodes'],[18])
+            originals={p.name:p.read_bytes() for p in (root/'content/courses').glob('*.json')}
+            self.assertEqual(self.run_main(root,args),0)
+            retry=json.loads(report.read_text())
+            self.assertEqual(retry['backfilled_dates'],[])
+            self.assertEqual(retry['imported'],0)
+            self.assertEqual(originals,{p.name:p.read_bytes() for p in (root/'content/courses').glob('*.json')})
+
+    def test_invalid_previous_inbox_blocks_today_and_preserves_ledger(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);source=self.inbox(root,lesson(18))
+            source.with_name('2026-10-09.json').write_text('invalid payload')
+            ledger=root/'content/sync/latest.json';ledger.parent.mkdir(parents=True)
+            ledger.write_text('{"target_date":"2026-10-08"}')
+            saved=ledger.read_bytes();report=root/'report.json'
+            self.assertEqual(self.run_main(root,['--date','2026-10-10','--report',str(report)]),1)
+            self.assertEqual(json.loads(report.read_text())['status'],'failed')
+            self.assertEqual(ledger.read_bytes(),saved)
+            self.assertFalse((root/'content/courses').exists())
+
     def setUp(self): self.assertTrue(hasattr(update,'sync'),'需要实现真实原文入库的自动更新入口')
     def run_main(self,root,args):
         with patch.object(update,'ROOT',root),patch.object(sys,'argv',['update.py',*args]),contextlib.redirect_stdout(io.StringIO()),contextlib.redirect_stderr(io.StringIO()):
