@@ -47,7 +47,18 @@ def main():
     try:
         if date.fromisoformat(target).isoformat()!=target or target>today:
             raise ValueError('目标日期必须为YYYY-MM-DD，且不能晚于北京时间今天')
+        # Backfill original inbox files in chronological order before today's import.
+        # Older files are revalidated; identical courses are skipped by import_messages.
+        backfilled_dates=[]
+        if not args.source:
+            for prior in sorted((ROOT/'content/inbox').glob('????-??-??.json')):
+                if prior.stem >= target:
+                    break
+                earlier=sync(ROOT,prior.stem,prior)
+                if earlier['imported']:
+                    backfilled_dates.append(prior.stem)
         report=sync(ROOT,target,source)
+        report['backfilled_dates']=backfilled_dates
         report['status']='success'
     except (ValueError,OSError,KeyError,TypeError) as error:
         report={'schema_version':1,'checked_at':datetime.now(ZoneInfo('Asia/Shanghai')).isoformat(),
