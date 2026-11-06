@@ -11,6 +11,24 @@ update=importlib.util.module_from_spec(spec)
 if p.exists(): spec.loader.exec_module(update)
 
 class UpdateTests(unittest.TestCase):
+    def test_replacement_task_preserves_real_delivery_and_rejects_other_sources(self):
+        task='6aed8351250c8191857f98b99016f40c'
+        conversation='6ac9e367-6ea8-83ec-aeee-555083ffcfb7'
+        delivery={'automation_id':task,'id':f'{task}:2026-10-10'}
+        course=update.library.parse_course(lesson(19),None,conversation,delivery)
+        self.assertEqual(course['body'],lesson(19))
+        self.assertEqual(course['source']['delivery'],delivery)
+        self.assertIsNone(course['source']['message_id'])
+        invalid=[(None,'other-chat',delivery),
+                 ('invented-message-id',conversation,delivery),
+                 (None,conversation,{'automation_id':task,'id':'6ac9e53a5cdc8191b955c5a84cdc3c2f:2026-10-10'}),
+                 (None,conversation,{'automation_id':'unknown-task','id':'unknown-task:2026-10-10'}),
+                 (None,conversation,{'automation_id':task,'id':f'{task}:2026-10-11'})]
+        for message_id,chat,source in invalid:
+            with self.subTest(source=source,chat=chat,message_id=message_id):
+                with self.assertRaises(ValueError):
+                    update.library.parse_course(lesson(19),message_id,chat,source)
+
     def test_late_previous_inbox_is_imported_with_today_and_retry_is_idempotent(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder);source=self.inbox(root,lesson(18))

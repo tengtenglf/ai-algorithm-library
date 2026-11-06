@@ -44,8 +44,10 @@ def parse_course(raw, message_id, conversation_id, delivery=None):
     if delivery is not None:
         # The producer cannot know its final chat-message UUID before publishing.
         # Keep a separate deterministic delivery key rather than inventing a UUID.
-        task = '6ac9e53a5cdc8191b955c5a84cdc3c2f'
+        task = delivery.get('automation_id') if isinstance(delivery, dict) else None
         if (not isinstance(delivery, dict) or message_id is not None
+                # Keep historical delivery identities while admitting the verified replacement.
+                or task not in ('6ac9e53a5cdc8191b955c5a84cdc3c2f', '6aed8351250c8191857f98b99016f40c')
                 or conversation_id != '6ac9e367-6ea8-83ec-aeee-555083ffcfb7'
                 or delivery != {'automation_id': task, 'id': f'{task}:{when}'}):
             raise ValueError('云端投递来源不匹配；日期、原任务、原聊天与独立投递编号必须一致，禁止伪造消息ID')
