@@ -1,28 +1,26 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-06T15:17:17.818982+08:00",
-  "target_date": "2026-11-06",
+  "checked_at": "2026-11-26T15:42:09.340910+08:00",
+  "target_date": "2026-11-26",
   "source_conversation_id": "6ac9e367-6ea8-83ec-aeee-555083ffcfb7",
   "source_message_ids": [
-    null
+    "bc49eb6c-8db4-4c42-ad58-35b9a61c9d72"
   ],
   "source_delivery_ids": [
-    "6ac9e53a5cdc8191b955c5a84cdc3c2f:2026-11-06"
+    null
   ],
   "source_episodes": [
-    28
+    29
   ],
   "source_sha256": [
-    "aba3b6cc49f088756653c8fe67d6a7935544b7f21aab659d6836b7fd5b3327de"
+    "2109a99e1c5fb065c62ea1027055c8e937144d519f76ce1288ee590907f13619"
   ],
   "processed": 1,
   "imported": 1,
-  "complete_count": 28,
-  "expected_count": 28,
+  "complete_count": 29,
+  "expected_count": 29,
   "missing_episodes": [],
   "chatgpt_task_direct_output": "cloud_full_original_sync_verified",
-  "backfilled_dates": [
-    "2026-11-05"
-  ],
+  "backfilled_dates": [],
   "status": "success"
 }
