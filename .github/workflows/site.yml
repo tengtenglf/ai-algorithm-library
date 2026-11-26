@@ -25,8 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      PAGES_ARTIFACT_NAME: github-pages-${{ github.run_attempt }}
     outputs:
       publish: ${{ steps.import.outputs.publish }}
+      pages_artifact_name: ${{ env.PAGES_ARTIFACT_NAME }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -88,6 +91,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name == 'pull_request' || steps.import.outputs.publish == 'true'
         with:
+          name: ${{ env.PAGES_ARTIFACT_NAME }}
           path: dist
   deploy:
     if: needs.build.outputs.publish == 'true'
@@ -104,3 +108,5 @@ jobs:
       - name: Deploy verified content
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: ${{ needs.build.outputs.pages_artifact_name }}
