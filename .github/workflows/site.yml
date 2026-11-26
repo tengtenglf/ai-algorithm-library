@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      publish: ${{ steps.import.outputs.publish }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,10 +39,24 @@ jobs:
           node-version: '22'
       - run: python -m pip install -r requirements.txt
       - name: Import today's original messages
+        id: import
         if: github.event_name != 'pull_request'
         env:
           TARGET_DATE: ${{ inputs.target_date }}
-        run: python scripts/update.py --date "$TARGET_DATE" --report "$RUNNER_TEMP/sync-report.json"
+        run: |
+          report="$RUNNER_TEMP/sync-report.json"
+          args=()
+          if [[ "$GITHUB_EVENT_NAME" == push || "$GITHUB_EVENT_NAME" == schedule ]]; then
+            args+=(--allow-missing)
+          fi
+          python scripts/update.py --date "$TARGET_DATE" --report "$report" "${args[@]}"
+          if jq -e '.status == "missing_inbox"' "$report" >/dev/null; then
+            target_date=$(jq -r '.target_date' "$report")
+            echo "::warning title=Missing original course::No original inbox for $target_date. See the import report."
+          fi
+          if [[ "$GITHUB_EVENT_NAME" != schedule ]] || jq -e '.status == "success" or (.backfilled_dates | length > 0)' "$report" >/dev/null; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
       - run: python -m unittest discover -s tests -v
       - run: node --test tests/review.test.cjs
       - run: python scripts/library.py audit
@@ -70,10 +86,11 @@ jobs:
           name: original-course-sync-evidence
           path: ${{ runner.temp }}/sync-report.json
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name == 'pull_request' || steps.import.outputs.publish == 'true'
         with:
           path: dist
   deploy:
-    if: github.event_name != 'pull_request'
+    if: needs.build.outputs.publish == 'true'
     needs: build
     runs-on: ubuntu-latest
     permissions:
