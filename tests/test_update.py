@@ -56,10 +56,46 @@ class UpdateTests(unittest.TestCase):
             ledger=root/'content/sync/latest.json';ledger.parent.mkdir(parents=True)
             ledger.write_text('{"target_date":"2026-10-08"}')
             saved=ledger.read_bytes();report=root/'report.json'
-            self.assertEqual(self.run_main(root,['--date','2026-10-10','--report',str(report)]),1)
+            self.assertEqual(self.run_main(root,['--date','2026-10-10','--report',str(report),'--allow-missing']),1)
             self.assertEqual(json.loads(report.read_text())['status'],'failed')
             self.assertEqual(ledger.read_bytes(),saved)
             self.assertFalse((root/'content/courses').exists())
+
+    def test_automatic_run_waits_for_missing_inbox_and_keeps_success_ledger(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            self.inbox(root,lesson(18))
+            report=root/'report.json'
+            self.assertEqual(self.run_main(root,['--date','2026-10-10','--report',str(report)]),0)
+            ledger=root/'content/sync/latest.json'
+            saved=ledger.read_bytes()
+            self.assertEqual(self.run_main(root,['--date','2026-10-11','--report',str(report),'--allow-missing']),0)
+            evidence=json.loads(report.read_text())
+            self.assertEqual(evidence['status'],'missing_inbox')
+            self.assertEqual(evidence['target_date'],'2026-10-11')
+            self.assertEqual(evidence['backfilled_dates'],[])
+            self.assertEqual(ledger.read_bytes(),saved)
+
+    def test_automatic_run_preserves_delayed_original_when_today_is_missing(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            self.inbox(root,lesson(18))
+            report=root/'report.json'
+            args=['--date','2026-10-11','--report',str(report),'--allow-missing']
+            self.assertEqual(self.run_main(root,args),0)
+            evidence=json.loads(report.read_text())
+            self.assertEqual(evidence['status'],'missing_inbox')
+            self.assertEqual(evidence['backfilled_dates'],['2026-10-10'])
+            ledger=root/'content/sync/latest.json'
+            saved=ledger.read_bytes()
+            recorded=json.loads(saved)
+            self.assertEqual(recorded['status'],'success')
+            self.assertEqual(recorded['target_date'],'2026-10-10')
+            self.assertEqual(recorded['source_episodes'],[18])
+            self.assertEqual(json.loads((root/'content/courses/018.json').read_bytes())['body'],lesson(18))
+            self.assertEqual(self.run_main(root,args),0)
+            self.assertEqual(json.loads(report.read_text())['backfilled_dates'],[])
+            self.assertEqual(ledger.read_bytes(),saved)
 
     def setUp(self): self.assertTrue(hasattr(update,'sync'),'需要实现真实原文入库的自动更新入口')
     def run_main(self,root,args):

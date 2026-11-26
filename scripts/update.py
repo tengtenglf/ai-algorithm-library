@@ -39,17 +39,19 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument('--source',default='')
     p.add_argument('--date',default='',help='补投日期YYYY-MM-DD；留空检查北京时间今天')
+    p.add_argument('--allow-missing',action='store_true',help='自动运行可等待当天原文，并保留已校验的历史补投')
     p.add_argument('--report',required=True)
     args=p.parse_args()
     today=datetime.now(ZoneInfo('Asia/Shanghai')).date().isoformat()
     target=args.date or today
     source=ROOT/args.source if args.source else ROOT/'content/inbox'/f'{target}.json'
+    backfilled_dates=[]
+    latest_backfill=None
     try:
         if date.fromisoformat(target).isoformat()!=target or target>today:
             raise ValueError('目标日期必须为YYYY-MM-DD，且不能晚于北京时间今天')
         # Backfill original inbox files in chronological order before today's import.
         # Older files are revalidated; identical courses are skipped by import_messages.
-        backfilled_dates=[]
         if not args.source:
             for prior in sorted((ROOT/'content/inbox').glob('????-??-??.json')):
                 if prior.stem >= target:
@@ -57,24 +59,35 @@ def main():
                 earlier=sync(ROOT,prior.stem,prior)
                 if earlier['imported']:
                     backfilled_dates.append(prior.stem)
+                    latest_backfill=earlier
         report=sync(ROOT,target,source)
         report['backfilled_dates']=backfilled_dates
         report['status']='success'
     except (ValueError,OSError,KeyError,TypeError) as error:
+        missing_inbox=isinstance(error,FileNotFoundError) and error.filename==str(source.resolve())
+        waiting=missing_inbox and args.allow_missing and not args.source
         report={'schema_version':1,'checked_at':datetime.now(ZoneInfo('Asia/Shanghai')).isoformat(),
-                'target_date':target,'status':'failed',
-                'error_code':'missing_inbox' if isinstance(error,FileNotFoundError) and error.filename==str(source.resolve()) else 'invalid_source_or_sync',
+                'target_date':target,'status':'missing_inbox' if waiting else 'failed',
+                'error_code':'missing_inbox' if missing_inbox else 'invalid_source_or_sync',
                 'error':str(error)}
-        Path(args.report).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-        print(f'ERROR: {error}',file=sys.stderr)
-        return 1
+        if waiting:
+            report['backfilled_dates']=backfilled_dates
     Path(args.report).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    ledger=ROOT/'content/sync/latest.json'
-    old=json.loads(ledger.read_text()) if ledger.exists() else {}
-    if (report['imported'] or old.get('complete_count')!=report['complete_count']
-            or old.get('chatgpt_task_direct_output')!=report['chatgpt_task_direct_output']):
-        ledger.parent.mkdir(parents=True,exist_ok=True)
-        ledger.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    if report['status']=='failed':
+        print(f"ERROR: {report['error']}",file=sys.stderr)
+        return 1
+    ledger_report=report
+    if report['status']=='missing_inbox':
+        ledger_report=latest_backfill
+        if ledger_report:
+            ledger_report.update(status='success',backfilled_dates=backfilled_dates[:-1])
+    if ledger_report:
+        ledger=ROOT/'content/sync/latest.json'
+        old=json.loads(ledger.read_text()) if ledger.exists() else {}
+        if (ledger_report['imported'] or old.get('complete_count')!=ledger_report['complete_count']
+                or old.get('chatgpt_task_direct_output')!=ledger_report['chatgpt_task_direct_output']):
+            ledger.parent.mkdir(parents=True,exist_ok=True)
+            ledger.write_text(json.dumps(ledger_report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report,ensure_ascii=False))
     return 0
 
